@@ -6,26 +6,30 @@ document.addEventListener('DOMContentLoaded', () => {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const usernameInput = document.getElementById('username').value;
+            const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
             try {
+                console.log('Attempting login for:', username); // Debug log
+                
                 const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ username: usernameInput, password })
+                    body: JSON.stringify({ username, password })
                 });
 
                 const data = await response.json();
-                
+                console.log('Server response:', data); // Debug log
+
                 if (response.ok) {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('userId', data.userId);
-                    // Store the actual username that was input
-                    localStorage.setItem('username', usernameInput);
-                    window.location.href = 'index.html';
+                    localStorage.setItem('username', data.username);
+                    
+                    console.log('Login successful, redirecting...'); // Debug log
+                    window.location.href = '/index.html';
                 } else {
                     alert(data.message || 'Login failed');
                 }

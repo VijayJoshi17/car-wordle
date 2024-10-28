@@ -42,95 +42,63 @@ const User = mongoose.model('User', UserSchema);
 
 app.use(express.json());
 
-// Modify the root route handler
-app.get('/', (req, res) => {
-    res.redirect('/login');
-});
-
-// Add middleware to protect index.html
-app.get('/index.html', (req, res) => {
-    res.redirect('/login');
-});
-
-// Update the static file serving
-app.use((req, res, next) => {
-    // Allow access to login and register pages and their resources
-    if (req.path === '/login' || 
-        req.path === '/login.html' || 
-        req.path === '/register' || 
-        req.path === '/register.html' ||
-        req.path === '/styles.css' ||
-        req.path === '/login.css' ||
-        req.path.startsWith('/images/') ||
-        req.path === '/script.js' ||
-        req.path === '/carData.js' ||
-        req.path.startsWith('/api/')) {
-        next();
-    } else {
-        // For all other routes, check if user is authenticated
-        const token = req.headers.authorization || req.query.token;
-        if (!token) {
-            res.redirect('/login');
-        } else {
-            next();
-        }
-    }
-});
-
-// Place this AFTER the middleware and BEFORE other routes
+// Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Update login route to serve login.html
+// Routes for authentication pages
+app.get('/', (req, res) => {
+    res.redirect('/login.html');
+});
+
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+    res.redirect('/login.html');
 });
 
-// Update register route to serve register.html
 app.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'register.html'));
+    res.redirect('/register.html');
 });
 
-// Register route
-app.post('/api/register', async (req, res) => {
-    try {
-        const { username, email, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ username, email, password: hashedPassword });
-        await user.save();
-        res.status(201).json({ message: 'User registered successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error registering user' });
+// Protected route middleware - only for game-related pages
+app.use('/index.html', (req, res, next) => {
+    const token = req.headers.authorization;
+    if (!token) {
+        return res.redirect('/login.html');
     }
+    next();
 });
 
-// Login route
+// Update the login route
 app.post('/api/login', async (req, res) => {
     try {
+        console.log('Login attempt:', req.body); // Debug log
         const { username, password } = req.body;
         const user = await User.findOne({ username });
+        
         if (!user) {
+            console.log('User not found:', username); // Debug log
             return res.status(400).json({ message: 'Invalid credentials' });
         }
+        
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
+            console.log('Password mismatch for user:', username); // Debug log
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        // Update JWT secret
-        const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
-
-        // Use JWT_SECRET in your code
-        const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign(
+            { userId: user._id, username: user.username },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
         
-        // Send back all necessary user data
+        console.log('Login successful for:', username); // Debug log
+        
         res.json({ 
             token,
             userId: user._id,
-            username: user.username, // Make sure username is included
+            username: user.username,
             message: 'Login successful'
         });
-        
-        console.log('Login successful:', { username: user.username });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ message: 'Error logging in' });
@@ -176,7 +144,7 @@ const GameHistorySchema = new mongoose.Schema({
 
 const GameHistory = mongoose.model('GameHistory', GameHistorySchema);
 
-// Update the auth middleware
+// Update the auth middleware to use the correct JWT_SECRET
 const auth = async (req, res, next) => {
     try {
         const authHeader = req.header('Authorization');
@@ -189,7 +157,8 @@ const auth = async (req, res, next) => {
             return res.status(401).json({ error: 'No token provided' });
         }
 
-        const decoded = jwt.verify(token, 'your_jwt_secret');
+        // Use the environment variable JWT_SECRET
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (!decoded.userId) {
             return res.status(401).json({ error: 'Invalid token format' });
         }
@@ -252,6 +221,47 @@ app.get('/api/user', auth, async (req, res) => {
 // Update port configuration
 const PORT = process.env.PORT || 3000;
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
-
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Add this registration route in server.js after the login route
+app.post('/api/register', async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+
+        // Check if user already exists
+        const existingUser = await User.findOne({ 
+            $or: [
+                { username: username },
+                { email: email }
+            ]
+        });
+
+        if (existingUser) {
+            return res.status(400).json({ 
+                message: 'Username or email already exists' 
+            });
+        }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create new user
+        const user = new User({
+            username,
+            email,
+            password: hashedPassword
+        });
+
+        await user.save();
+        console.log('User registered successfully:', username);
+        
+        res.status(201).json({ 
+            message: 'Registration successful. Please login.' 
+        });
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.status(500).json({ 
+            message: 'Error during registration' 
+        });
+    }
+});
