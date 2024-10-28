@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Wordle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="images/car-icon.png" type="image/png">
+</head>
+<body>
+    <div class="container">
+        <div class="header-container">
+            <h1>🚗 Car Wordle</h1>
+            <div class="user-section">
+                <span id="username-display" class="username-display"></span>
+                <button id="logout" class="logout-button">Logout</button>
+            </div>
+        </div>
+        <div id="game-info">
+            <p>Attempts: <span id="attempts">0</span></p>
+            <p>Hint Points: <span id="hint-points">3</span></p>
+            <button id="hint-button" class="hint-button">Get Hint</button>
+            <div id="hint" class="hint-area"></div>
+            <button id="view-history">View History</button>
+        </div>
+        <div id="search-area">
+            <input type="text" id="car-search" placeholder="Search for a car...">
+            <button id="submit-guess">Submit Guess</button>
+        </div>
+        <div id="guesses-grid"></div>
+        <div id="game-over" class="hidden">
+            <h2 id="game-result"></h2>
+            <p id="correct-car"></p>
+            <button id="play-again">Play Again</button>
+        </div>
+        <div id="history-modal" class="modal">
+            <div class="modal-content">
+                <span id="close-history" class="close">&times;</span>
+                <h2>Game History</h2>
+                <div id="history-content"></div>
+            </div>
+        </div>
+    </div>
+    <script src="carData.js" type="module"></script>
+    <script src="script.js" type="module"></script>
+</body>
+</html>

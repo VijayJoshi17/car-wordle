@@ -1,0 +1,501 @@
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background: linear-gradient(135deg, #de209e 0%, #2b51dc 100%);
+}
+
+.container {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    max-width: 1300px;
+    width: 95%;
+}
+
+h1 {
+    text-align: center;
+    color: black;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+#search-area {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+    width: 100%;
+    max-width: 400px;  
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#car-search {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.2rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
+    margin-bottom: 10px;
+}
+
+#car-search:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+#submit-guess {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.2rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#submit-guess:hover {
+    background-color: #2980b9;
+}
+
+button {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+#guesses-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 2rem;
+    overflow-x: auto;
+}
+
+.guess-row {
+    display: contents;
+}
+
+.guess-cell {
+    background-color: #b1d4f6;
+    border-radius: 5px;
+    padding: 10px 8px;
+    font-size: 0.9rem;
+    text-align: center;
+    transition: all 0.5s ease;
+    opacity: 0;
+    transform: scale(0.9);
+    word-wrap: break-word;
+    min-width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.guess-cell.revealed {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.guess-cell.green {
+    background-color: #a8e6cf;
+}
+
+.guess-cell.yellow {
+    background-color: #ffd3b6;
+}
+
+.guess-cell.grey {
+    background-color: #f1f3f5;
+}
+
+.hidden {
+    display: none;
+}
+
+.header-row {
+    font-weight: bold;
+    background-color: #f0f0f0;
+}
+
+.header-cell {
+    opacity: 1;
+    transform: scale(1);
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.header-container h1 {
+    margin: 0;
+}
+
+.logout-button {
+    background-color: #e74c3c;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+    background-color: #c0392b;
+}
+
+@media (max-width: 1200px) {
+    .container {
+        padding: 1.5rem;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    #car-search, button {
+        font-size: 1rem;
+    }
+
+    #guesses-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .guess-cell {
+        font-size: 0.8rem;
+        padding: 8px 6px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    #car-search, button {
+        font-size: 0.9rem;
+    }
+
+    #guesses-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .guess-cell {
+        font-size: 0.7rem;
+        padding: 6px 4px;
+    }
+}
+
+.car-name-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.car-image {
+    max-width: 100px;
+    max-height: 60px;
+    object-fit: contain;
+    margin-bottom: 5px;
+}
+
+#car-preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.car-preview-image {
+    max-width: 150px;
+    max-height: 90px;
+    object-fit: contain;
+}
+
+.car-dropdown {
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background-color: white;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 0 0 5px 5px;
+    margin-top: -10px;
+    display: none;
+}
+
+.car-option {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.car-option:hover {
+    background-color: #f0f0f0;
+}
+
+.car-option-image {
+    width: 50px;
+    height: 30px;
+    object-fit: contain;
+    margin-right: 10px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 5px;
+    position: relative;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 5px;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#history-content {
+    margin-top: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.history-item {
+    border: 1px solid #ddd;
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.history-result {
+    font-weight: bold;
+}
+
+.history-result.win {
+    color: green;
+}
+
+.history-result.loss {
+    color: red;
+}
+
+.history-details {
+    font-size: 0.9em;
+}
+
+.history-date {
+    color: #666;
+}
+
+.history-empty, .history-error {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+.history-error {
+    color: #ff4444;
+}
+
+.history-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+} 
+
+
+
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.username-display {
+    color: #2c3e50;
+    font-size: 1.3rem;
+    font-weight: 500;
+    padding: 5px 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.hint-area {
+    margin: 15px 0;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+}
+
+.hint-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.hint-text {
+    font-size: 1.1rem;
+    color: #2c3e50;
+}
+
+.hint-cost {
+    font-size: 0.9rem;
+    color: #e74c3c;
+}
+
+.hint-error {
+    color: #e74c3c;
+    font-style: italic;
+}
+
+.hint-button {
+    background-color: #2ecc71;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.hint-button:hover {
+    background-color: #27ae60;
+}
+
+.hint-button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+#hint-points {
+    font-weight: bold;
+    color: #2ecc71;
+}
+
+.hint-level-selection {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.hint-level-selection h3 {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+    font-size: 1.1rem;
+}
+
+.hint-level-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.hint-level-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 15px;
+    background-color: #fff;
+    border: 2px solid #3498db;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    text-align: left;
+}
+
+.hint-level-btn:hover {
+    background-color: #3498db;
+    color: white;
+}
+
+.hint-level-desc {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 4px;
+}
+
+.hint-level-btn:hover .hint-level-desc {
+    color: #e8f4fc;
+}
+
+.hint-level-btn[disabled] {
+    background-color: #ccc;
+    border-color: #999;
+    cursor: not-allowed;
+}
